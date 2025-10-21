@@ -1,0 +1,50 @@
+Resources
+| where type == "microsoft.network/virtualnetworks"
+| project 
+    // Basic Information
+    VNetName = name,
+    ResourceId = id,
+    ResourceGroup = resourceGroup,
+    Location = location,
+    SubscriptionId = subscriptionId,
+    Tags = tags,
+    
+    // Network Configuration
+    AddressSpace = properties.addressSpace.addressPrefixes,
+    DnsServers = properties.dhcpOptions.dnsServers,
+    
+    // Subnets Details
+    Subnets = properties.subnets,
+    SubnetCount = array_length(properties.subnets),
+    SubnetNames = extract_all(@'"name":"([^"]+)"', tostring(properties.subnets)),
+    SubnetAddresses = extract_all(@'"addressPrefix":"([^"]+)"', tostring(properties.subnets)),
+    
+    // Peering Information
+    VNetPeerings = properties.virtualNetworkPeerings,
+    PeeringCount = array_length(properties.virtualNetworkPeerings),
+    
+    // DDoS Protection
+    EnableDdosProtection = properties.enableDdosProtection,
+    DdosProtectionPlan = properties.ddosProtectionPlan.id,
+    
+    // VM Protection
+    EnableVmProtection = properties.enableVmProtection,
+    
+    // BGP Communities
+    BgpCommunities = properties.bgpCommunities,
+    
+    // Encryption
+    Encryption = properties.encryption,
+    
+    // Flow Logs
+    FlowTimeoutInMinutes = properties.flowTimeoutInMinutes,
+    
+    // Resource GUID
+    ResourceGuid = properties.resourceGuid,
+    
+    // Provisioning State
+    ProvisioningState = properties.provisioningState,
+    
+    // Raw Properties (for any additional details)
+    AllProperties = properties
+| order by VNetName asc
