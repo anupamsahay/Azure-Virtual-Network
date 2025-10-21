@@ -1,0 +1,18 @@
+Resources
+| where type == "microsoft.network/virtualnetworks"
+| mv-expand peering = properties.virtualNetworkPeerings
+| project 
+    LocalVNetName = name,
+    LocalVNetId = id,
+    LocalResourceGroup = resourceGroup,
+    PeeringName = peering.name,
+    RemoteVNetId = peering.properties.remoteVirtualNetwork.id,
+    PeeringState = peering.properties.peeringState,
+    AllowVirtualNetworkAccess = peering.properties.allowVirtualNetworkAccess,
+    AllowForwardedTraffic = peering.properties.allowForwardedTraffic,
+    AllowGatewayTransit = peering.properties.allowGatewayTransit,
+    UseRemoteGateways = peering.properties.useRemoteGateways,
+    RemoteAddressSpace = peering.properties.remoteAddressSpace.addressPrefixes,
+    RemoteBgpCommunities = peering.properties.remoteBgpCommunities,
+    PeeringProvisioningState = peering.properties.provisioningState
+| order by LocalVNetName, PeeringName
