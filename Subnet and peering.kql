@@ -1,0 +1,41 @@
+Resources
+| where type == "microsoft.network/virtualnetworks"
+| extend 
+    VNetName = name,
+    ResourceGroup = resourceGroup,
+    Location = location,
+    AddressSpace = properties.addressSpace.addressPrefixes,
+    DnsServers = properties.dhcpOptions.dnsServers
+| mv-expand subnet = properties.subnets
+| extend 
+    SubnetName = subnet.name,
+    SubnetId = subnet.id,
+    SubnetAddressPrefix = subnet.properties.addressPrefix,
+    SubnetNSG = subnet.properties.networkSecurityGroup.id,
+    SubnetRouteTable = subnet.properties.routeTable.id,
+    SubnetServiceEndpoints = subnet.properties.serviceEndpoints,
+    SubnetDelegations = subnet.properties.delegations,
+    SubnetPrivateEndpointNetworkPolicies = subnet.properties.privateEndpointNetworkPolicies,
+    SubnetPrivateLinkServiceNetworkPolicies = subnet.properties.privateLinkServiceNetworkPolicies
+| project 
+    VNetName,
+    ResourceId = id,
+    ResourceGroup,
+    Location,
+    SubscriptionId = subscriptionId,
+    Tags = tags,
+    AddressSpace,
+    DnsServers,
+    SubnetName,
+    SubnetId,
+    SubnetAddressPrefix,
+    SubnetNSG,
+    SubnetRouteTable,
+    SubnetServiceEndpoints,
+    SubnetDelegations,
+    SubnetPrivateEndpointNetworkPolicies,
+    SubnetPrivateLinkServiceNetworkPolicies,
+    EnableDdosProtection = properties.enableDdosProtection,
+    EnableVmProtection = properties.enableVmProtection,
+    ProvisioningState = properties.provisioningState
+| order by VNetName, SubnetName
